@@ -27,6 +27,7 @@ from tensorflow.python.layers import core as layers_core
 from . import model_helper
 from .utils import iterator_utils
 from .utils import misc_utils as utils
+from . import basic_decoder
 
 utils.check_tensorflow_version()
 
@@ -398,7 +399,7 @@ class BaseModel(object):
             time_major=self.time_major)
 
         # Decoder
-        my_decoder = tf.contrib.seq2seq.BasicDecoder(
+        my_decoder = basic_decoder.BasicDecoder(
             cell,
             helper,
             decoder_initial_state,)
@@ -450,7 +451,7 @@ class BaseModel(object):
                 self.embedding_decoder, start_tokens, end_token)
 
           # Decoder
-          my_decoder = tf.contrib.seq2seq.BasicDecoder(
+          my_decoder = basic_decoder.BasicDecoder(
               cell,
               helper,
               decoder_initial_state,

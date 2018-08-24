@@ -21,6 +21,8 @@ import tensorflow as tf
 
 from . import model
 from . import model_helper
+from . import attention_wrapper
+from . import tf_print
 
 __all__ = ["AttentionModel"]
 
@@ -114,7 +116,7 @@ class AttentionModel(model.Model):
     # Only generate alignment in greedy INFER mode.
     alignment_history = (self.mode == tf.contrib.learn.ModeKeys.INFER and
                          beam_width == 0)
-    cell = tf.contrib.seq2seq.AttentionWrapper(
+    cell = attention_wrapper.AttentionWrapper(
         cell,
         attention_mechanism,
         attention_layer_size=num_units,
@@ -148,10 +150,10 @@ def create_attention_mechanism(attention_option, num_units, memory,
 
   # Mechanism
   if attention_option == "luong":
-    attention_mechanism = tf.contrib.seq2seq.LuongAttention(
+    attention_mechanism = attention_wrapper.LuongAttention(
         num_units, memory, memory_sequence_length=source_sequence_length)
   elif attention_option == "scaled_luong":
-    attention_mechanism = tf.contrib.seq2seq.LuongAttention(
+    attention_mechanism = attention_wrapper.LuongAttention(
         num_units,
         memory,
         memory_sequence_length=source_sequence_length,
@@ -179,5 +181,7 @@ def _create_attention_images_summary(final_context_state):
       tf.transpose(attention_images, [1, 2, 0]), -1)
   # Scale to range [0, 255]
   attention_images *= 255
+  #attention_images = tf.Print(attention_images, [attention_images], message="ATTENTION MATRIX ========> ", summarize=10000000)
+  attention_images = tf_print.tf_print2file(attention_images, [attention_images], message="", outputFile="./attention_output")
   attention_summary = tf.summary.image("attention_images", attention_images)
   return attention_summary
